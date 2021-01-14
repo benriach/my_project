@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+  <head>
+    <!-- Webpage Title -->
+    <title>KOSPI STUDY</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="/static/images/favicon.png">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <!-- 구글폰트 -->
+    <link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet">
+
+    <script type="text/javascript">
+
+        //상승주_1, 하락주_2
+        $(document).ready(function () {
+            $("#reviews-box1").html("");
+            $("#reviews-box2").html("");
+            $("#timeline_box").html("");
+            // $("#day_write").html("");
+            todayRank1();
+            todayRank2();
+            today();
+            bookmark();
+        });
+
+        function todayRank1() {
+            // 1. 리뷰 목록을 서버에 요청하기
+            $.ajax({
+                type: "GET",
+                url: "/rank1",
+                data: {},
+                success: function (response) {
+                    // 2. 요청 성공 여부 확인하기
+                    if (response["result"] == "success") {
+                        let rank1 = response["reviews"];
+                        // 3. 요청 성공했을 때 리뷰를 올바르게 화면에 나타내기
+                        for (let i = 0; i < rank1.length; i++) {
+                            makeCard1(rank1[i]["rank"], rank1[i]["type"], rank1[i]["name"], rank1[i]["price"], rank1[i]["ratio"], rank1[i]["percent"], rank1[i]["amount"], rank1[i]["url"]);
+                        }
+                    } else {
+                        alert("리뷰를 받아오지 못했습니다");
+                    }
+                }
+            })
+        }
+
+        function todayRank2() {
+            // 1. 리뷰 목록을 서버에 요청하기
+            $.ajax({
+                type: "GET",
+                url: "/rank2",
+                data: {},
+                success: function (response) {
+                    // 2. 요청 성공 여부 확인하기
+                    if (response["result"] == "success") {
+                        let rank2 = response["reviews"];
+                        // 3. 요청 성공했을 때 리뷰를 올바르게 화면에 나타내기
+                        for (let i = 0; i < rank2.length; i++) {
+                            makeCard2(rank2[i]["rank"], rank2[i]["type"], rank2[i]["name"], rank2[i]["price"], rank2[i]["ratio"], rank2[i]["percent"], rank2[i]["amount"], rank2[i]["url"]);
+                        }
+                    } else {
+                        alert("리뷰를 받아오지 못했습니다");
+                    }
+                }
+            })
+        }
+
+        function makeCard1(rank, type, name, price, ratio, percent, amount, url) {
+            let tempHtml = `<tr>
+                        <td>${rank}</td>
+                        <td>${type}</td>
+                        <td width="150">${name}</td>
+                        <td>${price}</td>
+                        <td>${ratio}</td>
+                        <td style="color:red">${percent}</td>
+                        <td>${amount}</td>
+                        <td><a href="${url}" target="_blank">${url}</a></td>
+                    </tr>`;
+            $("#reviews-box1").append(tempHtml);
+        }
+
+        function makeCard2(rank, type, name, price, ratio, percent, amount, url) {
+            let tempHtml = `<tr>
+                        <td>${rank}</td>
+                        <td>${type}</td>
+                        <td width="150">${name}</td>
+                        <td>${price}</td>
+                        <td>${ratio}</td>
+                        <td style="color:blue">${percent}</td>
+                        <td>${amount}</td>
+                        <td><a href="${url}" target="_blank">${url}</a></td>
+                    </tr>`;
+            $("#reviews-box2").append(tempHtml);
+        }
+
+        function bookmark() {
+            // 1. 리뷰 목록을 서버에 요청하기
+            $.ajax({
+                type: "GET",
+                url: "/bookMark",
+                data: {},
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        let bm1 = response["review1"];
+                        for (let i = 0; i < bm1.length; i++) {
+                            bookmarkCard1(bm1[i]["rank"], bm1[i]["type"], bm1[i]["name"], bm1[i]["price"], bm1[i]["ratio"], bm1[i]["percent"], bm1[i]["amount"], bm1[i]["url"]);
+                        }
+                        let bm2 = response["review2"];
+                        for (let i = 0; i < bm2.length; i++) {
+                            bookmarkCard2(bm2[i]["rank"], bm2[i]["type"], bm2[i]["name"], bm2[i]["price"], bm2[i]["ratio"], bm2[i]["percent"], bm2[i]["amount"], bm2[i]["url"]);
+                        }
+                    }
+                }
+            })
+        }
+
+        function bookmarkCard1(rank, type, name, price, ratio, percent, amount, url) {
+                let tempHtml = `<tr>
+                          <td>${rank}</td>
+                          <td>${type}</td>
+                          <td>${name}</td>
+                          <td>${price}</td>
+                          <td>${ratio}</td>
+                          <td style="color:red">${percent}</td>
+                          <td>${amount}</td>
+                          <td><a href="${url}" target="_blank">${url}</a></td>
+                      </tr>`;
+                $("#timeline_box").append(tempHtml);
+        }
+       function bookmarkCard2(rank, type, name, price, ratio, percent, amount, url) {
+                let tempHtml = `<tr>
+                          <td>-${rank}</td>
+                          <td>${type}</td>
+                          <td width="150">${name}</td>
+                          <td>${price}</td>
+                          <td>${ratio}</td>
+                          <td style="color:blue">${percent}</td>
+                          <td>${amount}</td>
+                          <td><a href="${url}" target="_blank">${url}</a></td>
+                      </tr>`;
+                $("#timeline_box").append(tempHtml);
+        }
+
+
+        function today() {
+            // 1. 리뷰 목록을 서버에 요청하기
+            $.ajax({
+                type: "GET",
+                url: "/today",
+                data: {},
+                success: function (response) {
+                    // 2. 요청 성공 여부 확인하기
+                    if (response["result"] == "success") {
+                        let date = response["today"];
+                        date_day(date)
+                    }
+
+                }
+            })
+        }
+
+        function date_day(date) {
+            let day = `<h4>${date}</h4>`;
+            $("#day_write").append(day);
+        }
+
+
+    </script>
+
+    <style type="text/css">
+        * {
+            font-family: "Do Hyeon", sans-serif;
+        }
+
+        h1,
+        h5 {
+            display: inline;
+        }
+
+        .info {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .review {
+            text-align: center;
+        }
+
+        .reviews {
+            margin-top: 100px;
+        }
+    </style>
+  </head>
+
+  <body>
+    <div class="container" style="max-width: 1200px;">
+      <img
+          src="https://image.shutterstock.com/z/stock-photo-kospi-korean-composite-stock-price-indexes-business-concept-background-1869121249.jpg"
+          class="img-fluid" alt="Responsive image">
+      <div class="info">
+        <h1>KOSPI STUDY</h1>
+        <a>　　　　　　　　　　　　 　　　　　　　　　　　　　　　　　　　</a>
+        <a href="#" onclick="clickcr(this,'gnb_oth.my','','',event);" class="link" target="_top">Home　　　</a>
+        <a href="http://localhost:5000/" onclick="clickcr(this,'gnb_oth.my','','',event);" class="link" target="_top">Timeline　　　</a>
+        <a href="http://localhost:5000/rank1" onclick="clickcr(this,'gnb_oth.my','','',event);" class="link"
+           target="_top">Bookmark　　　</a>
+        <a href="http://localhost:5000/rank1" onclick="clickcr(this,'gnb_oth.my','','',event);" class="link"
+           target="_top">Rank</a>
+      </div>
+      <div class="home">
+        <h4>오늘의 상승주 TOP20</h4>
+        <table class="table">
+          <thead>
+          <tr>
+            <th scope="col">순위</th>
+            <th scope="col">종목명</th>
+            <th scope="col">업종</th>
+            <th scope="col">현재가</th>
+            <th scope="col">전일비</th>
+            <th scope="col">등락률</th>
+            <th scope="col">거래량</th>
+            <th scope="col">바로가기</th>
+          </tr>
+          </thead>
+          <tbody id="reviews-box1">
+          <tr>
+            <td>왕초보 8주 코딩</td>
+            <td>김르탄</td>
+            <td>역시 왕초보 코딩교육의 명가답군요. 따라하다보니 눈 깜짝할 사이에 8주가 지났습니다.</td>
+            <td>김르탄</td>
+            <td>김르탄</td>
+            <td style="color:red">김르탄</td>
+            <td>김르탄</td>
+            <td>김르탄</td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>오늘의 하락주 TOP20</h4>
+        <table class="table">
+          <thead>
+          <tr>
+            <th scope="col">순위</th>
+            <th scope="col">종목명</th>
+            <th scope="col">업종</th>
+            <th scope="col">현재가</th>
+            <th scope="col">전일비</th>
+            <th scope="col">등락률</th>
+            <th scope="col">거래량</th>
+            <th scope="col">바로가기</th>
+          </tr>
+          </thead>
+          <tbody id="reviews-box2">
+          <tr>
+            <td>왕초보 8주 코딩</td>
+            <td>김르탄</td>
+            <td>역시 .</td>
+            <td>김르탄</td>
+            <td>김르탄</td>
+            <td>김르탄</td>
+            <td>김르탄</td>
+            <td>김르탄</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 id="day_write">2021-01-15</h4>
+
+      <div class="timeline">
+
+        <table class="table">
+          <thead>
+          <tr>
+            <th scope="col">순위</th>
+            <th scope="col">종목명</th>
+            <th scope="col">업종</th>
+            <th scope="col">현재가</th>
+            <th scope="col">전일비</th>
+            <th scope="col">등락률</th>
+            <th scope="col">거래량</th>
+            <th scope="col">바로가기</th>
+          </tr>
+          </thead>
+          <tbody id="timeline_box">
+          <tr>
+            <td>왕초보 8주 코딩</td>
+            <td>김르탄</td>
+            <td>역시 왕초보 코딩교육의 명가답군요. 따라하다보니 눈 깜짝할 사이에 8주가 지났습니다.</td>
+            <td>김르탄</td>
+            <td>김르탄</td>
+            <td style="color:red">김르탄</td>
+            <td>김르탄</td>
+            <td>김르탄</td>
+          </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </body>
+
+</html>
+
